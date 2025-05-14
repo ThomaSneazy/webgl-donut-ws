@@ -11,7 +11,7 @@ if (!gl) {
   alert('WebGL non supporté');
 }
 
-// Vertex shader source
+// Vertex shader 
 const vertexShaderSource = `
 attribute vec2 a_position;
 void main() {
@@ -19,7 +19,7 @@ void main() {
 }
 `;
 
-// Fragment shader source
+// Fragment shader 
 const fragmentShaderSource = `
 precision mediump float;
 uniform vec2 u_resolution;
@@ -66,7 +66,6 @@ void main() {
 }
 `;
 
-// Création des shaders
 function createShader(gl, type, source) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -77,7 +76,6 @@ function createShader(gl, type, source) {
 const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
 const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-// Création du programme
 function createProgram(gl, vertexShader, fragmentShader) {
   const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
@@ -88,7 +86,6 @@ function createProgram(gl, vertexShader, fragmentShader) {
 
 const program = createProgram(gl, vertexShader, fragmentShader);
 
-// Création du buffer de positions (2 triangles pour couvrir tout l'écran)
 const positionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(
@@ -104,16 +101,13 @@ gl.bufferData(
   gl.STATIC_DRAW
 );
 
-// Utilisation du programme
 gl.useProgram(program);
 
-// Attribut de position
 const positionLocation = gl.getAttribLocation(program, "a_position");
 gl.enableVertexAttribArray(positionLocation);
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-// Uniforme de résolution
 const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
 gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
 
@@ -129,15 +123,12 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);
 
 
 
-// import './styles/style.css'
 
-// console.log('HELLO boiler')
 // import gsap from 'gsap'
 
 
 
 //   document.addEventListener('DOMContentLoaded', function() {
-//     // Définir les couleurs à animer
 //     const colors = [
 //       { top: "rgb(35, 0, 176)", middle: "rgb(1, 131, 253)" },      // Bleu
 //       { top: "rgb(0, 80, 255)", middle: "rgb(100, 180, 255)" },    // Bleu clair
@@ -147,13 +138,10 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);
 //       { top: "rgb(130, 0, 200)", middle: "rgb(180, 80, 255)" },    // Violet
 //     ];
 
-//     // Sélectionner l'élément à animer
 //     const donut = document.querySelector('.demi-donut');
     
-//     // Configuration de l'animation
 //     let currentIndex = 0;
     
-//     // Fonction pour mettre à jour le dégradé
 //     function updateGradient() {
 //       const nextIndex = (currentIndex + 1) % colors.length;
       
@@ -161,26 +149,20 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);
 //         duration: 3,  // Durée de la transition en secondes
 //         ease: "power2.inOut",  // Easing (slow start and end)
 //         onUpdate: function() {
-//           // Interpolation entre les couleurs actuelles et suivantes
 //           const progress = this.progress();
           
-//           // Mélange des couleurs actuelles avec les suivantes
 //           const topColor = interpolateColor(colors[currentIndex].top, colors[nextIndex].top, progress);
 //           const middleColor = interpolateColor(colors[currentIndex].middle, colors[nextIndex].middle, progress);
           
-//           // Application du nouveau dégradé
 //           donut.style.backgroundImage = `linear-gradient(176deg, ${topColor}, ${middleColor} 49%, black 75%)`;
 //         },
 //         onComplete: function() {
-//           // Passer à la couleur suivante
 //           currentIndex = nextIndex;
-//           // Continuer l'animation
 //           updateGradient();
 //         }
 //       });
 //     }
     
-//     // Fonction pour interpoler entre deux couleurs RGB
 //     function interpolateColor(color1, color2, factor) {
 //       // Extraire les composantes RGB
 //       const r1 = parseInt(color1.match(/\d+/g)[0]);
@@ -191,7 +173,6 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);
 //       const g2 = parseInt(color2.match(/\d+/g)[1]);
 //       const b2 = parseInt(color2.match(/\d+/g)[2]);
       
-//       // Interpoler les valeurs
 //       const r = Math.round(r1 + factor * (r2 - r1));
 //       const g = Math.round(g1 + factor * (g2 - g1));
 //       const b = Math.round(b1 + factor * (b2 - b1));
@@ -199,7 +180,6 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);
 //       return `rgb(${r}, ${g}, ${b})`;
 //     }
     
-//     // Animation de mouvement vertical
 //     gsap.to(donut, {
 //         y: -20,           // Déplacement de 20 pixels vers le haut
 //         duration: 2,      // Durée de 2 secondes
@@ -208,6 +188,5 @@ gl.drawArrays(gl.TRIANGLES, 0, 6);
 //         repeat: -1        // Répétition infinie
 //     });
     
-//     // Démarrer l'animation
 //     updateGradient();
 //   });
