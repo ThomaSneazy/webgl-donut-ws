@@ -1,192 +1,68 @@
-import './styles/style.css'
+import gsap from 'gsap';
+import Typewriter from 'typewriter-effect/dist/core';
 
-console.log('HELLO boiler')
+console.log('hello DONUTS');
 
-const canvas = document.getElementById('webgl-canvas');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Typewriter navbar anim
+new Typewriter('.hiring-text', {
+  strings: ["We're hiring!"],
+  autoStart: true,
+  loop: true,
+  cursor: '|',
+  delay: 150,
+  deleteSpeed: 50
+});
 
-const gl = canvas.getContext('webgl');
-if (!gl) {
-  alert('WebGL non supporté');
+// Gradient Video animation
+const gradientTl = gsap.timeline({
+  repeat: -1
+});
+
+gradientTl
+  .to('.gradient-1', {
+    width: '0%',
+    duration: 2,
+    ease: 'power3.inOut'
+  })
+  .to('.gradient-2', {
+    width: '70%',
+    duration: 2,
+    ease: 'power3.out'
+  }, '-=0.5')
+  .to('.gradient-2', {
+    width: '0%',
+    duration: 2,
+    ease: 'power3.inOut'
+  })
+  .to('.gradient-1', {
+    width: '70%',
+    duration: 2,
+    ease: 'power3.out'
+  }, '-=0.5');
+
+// Marquee animation
+function initMarquee() {
+  const lists = document.querySelectorAll('.marquee-css__list');
+  const firstList = lists[0];
+  const secondList = lists[1];
+  
+  const itemWidth = firstList.offsetWidth;
+  
+  gsap.to([firstList, secondList], {
+    x: -itemWidth,
+    duration: 30,
+    ease: 'none',
+    repeat: -1,
+    onRepeat: function() {
+      gsap.set([firstList, secondList], { x: 0 });
+    }
+  });
 }
 
-// Vertex shader 
-const vertexShaderSource = `
-attribute vec2 a_position;
-void main() {
-  gl_Position = vec4(a_position, 0, 1);
-}
-`;
-
-// Fragment shader 
-const fragmentShaderSource = `
-precision mediump float;
-uniform vec2 u_resolution;
-uniform float u_time;
-
-float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-}
-
-void main() {
-    vec2 uv = gl_FragCoord.xy / u_resolution;
-    uv = uv * 2.0 - 1.0;
-    uv.y = -uv.y;
-
-    // Paramètres du donut
-    float outerRadius = 0.9;
-    float innerRadius = 0.6;
-
-    float r = length(uv);
-    float angle = atan(uv.y, uv.x);
-
-    // Masque pour demi-donut (angle entre -PI et 0)
-    float inAngle = step(-3.14159, angle) * step(angle, 0.0);
-    float inRadius = smoothstep(innerRadius, innerRadius + 0.08, r) * (1.0 - smoothstep(outerRadius - 0.08, outerRadius, r));
-    float mask = inAngle * inRadius;
-
-    // Dégradé le long de l'anneau (par angle)
-    float t = (angle + 3.14159) / 3.14159;
-    vec3 color1 = vec3(0.2, 0.8, 1.0);
-    vec3 color2 = vec3(0.8, 0.9, 0.2);
-    vec3 color = mix(color1, color2, t);
-
-    // Glow doux (plus lumineux au centre du donut)
-    float glow = smoothstep(innerRadius, innerRadius + 0.15, r) * (1.0 - smoothstep(outerRadius - 0.15, outerRadius, r));
-    color += vec3(0.2, 0.3, 0.1) * glow * 0.7;
-
-    // Grain subtil
-    float grain = (random(uv * u_time) - 0.5) * 0.08;
-
-    // Alpha doux pour le fondu
-    float alpha = mask * 0.7 + glow * 0.3;
-
-    gl_FragColor = vec4(color + grain, alpha);
-}
-`;
-
-function createShader(gl, type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  return shader;
-}
-
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-function createProgram(gl, vertexShader, fragmentShader) {
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  return program;
-}
-
-const program = createProgram(gl, vertexShader, fragmentShader);
-
-const positionBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(
-  gl.ARRAY_BUFFER,
-  new Float32Array([
-    -1, -1,
-     1, -1,
-    -1,  1,
-    -1,  1,
-     1, -1,
-     1,  1,
-  ]),
-  gl.STATIC_DRAW
-);
-
-gl.useProgram(program);
-
-const positionLocation = gl.getAttribLocation(program, "a_position");
-gl.enableVertexAttribArray(positionLocation);
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-
-// Uniforme de temps
-const timeLocation = gl.getUniformLocation(program, "u_time");
-gl.uniform1f(timeLocation, Date.now() / 1000);
-
-// Dessin
-gl.viewport(0, 0, canvas.width, canvas.height);
-gl.clear(gl.COLOR_BUFFER_BIT);
-gl.drawArrays(gl.TRIANGLES, 0, 6);
+// Initialiser le marquee
+initMarquee();
 
 
 
 
 
-// import gsap from 'gsap'
-
-
-
-//   document.addEventListener('DOMContentLoaded', function() {
-//     const colors = [
-//       { top: "rgb(35, 0, 176)", middle: "rgb(1, 131, 253)" },      // Bleu
-//       { top: "rgb(0, 80, 255)", middle: "rgb(100, 180, 255)" },    // Bleu clair
-//       { top: "rgb(0, 150, 50)", middle: "rgb(20, 220, 100)" },     // Vert
-//       { top: "rgb(200, 200, 0)", middle: "rgb(255, 255, 0)" },     // Jaune
-//       { top: "rgb(255, 100, 0)", middle: "rgb(255, 150, 50)" },    // Orange
-//       { top: "rgb(130, 0, 200)", middle: "rgb(180, 80, 255)" },    // Violet
-//     ];
-
-//     const donut = document.querySelector('.demi-donut');
-    
-//     let currentIndex = 0;
-    
-//     function updateGradient() {
-//       const nextIndex = (currentIndex + 1) % colors.length;
-      
-//       gsap.to(donut, {
-//         duration: 3,  // Durée de la transition en secondes
-//         ease: "power2.inOut",  // Easing (slow start and end)
-//         onUpdate: function() {
-//           const progress = this.progress();
-          
-//           const topColor = interpolateColor(colors[currentIndex].top, colors[nextIndex].top, progress);
-//           const middleColor = interpolateColor(colors[currentIndex].middle, colors[nextIndex].middle, progress);
-          
-//           donut.style.backgroundImage = `linear-gradient(176deg, ${topColor}, ${middleColor} 49%, black 75%)`;
-//         },
-//         onComplete: function() {
-//           currentIndex = nextIndex;
-//           updateGradient();
-//         }
-//       });
-//     }
-    
-//     function interpolateColor(color1, color2, factor) {
-//       // Extraire les composantes RGB
-//       const r1 = parseInt(color1.match(/\d+/g)[0]);
-//       const g1 = parseInt(color1.match(/\d+/g)[1]);
-//       const b1 = parseInt(color1.match(/\d+/g)[2]);
-      
-//       const r2 = parseInt(color2.match(/\d+/g)[0]);
-//       const g2 = parseInt(color2.match(/\d+/g)[1]);
-//       const b2 = parseInt(color2.match(/\d+/g)[2]);
-      
-//       const r = Math.round(r1 + factor * (r2 - r1));
-//       const g = Math.round(g1 + factor * (g2 - g1));
-//       const b = Math.round(b1 + factor * (b2 - b1));
-      
-//       return `rgb(${r}, ${g}, ${b})`;
-//     }
-    
-//     gsap.to(donut, {
-//         y: -20,           // Déplacement de 20 pixels vers le haut
-//         duration: 2,      // Durée de 2 secondes
-//         ease: "power1.inOut",  // Type d'animation fluide
-//         yoyo: true,       // Retour à la position initiale
-//         repeat: -1        // Répétition infinie
-//     });
-    
-//     updateGradient();
-//   });
